@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { data } from "./data"; // Assure-toi que le chemin est correct
+import { data } from "./data"; 
 
 export const useStore = create((set) => ({
   selectedImage: require("../assets/super-mario-party-jamboree-website-board-1.jpg"), 

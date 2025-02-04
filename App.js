@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { BlurView } from "expo-blur"; // Import du flou
+import { BlurView } from "expo-blur"; 
 import { useStore } from "./store/useStore";
 
 export default function App() {
@@ -8,11 +8,11 @@ export default function App() {
 
   return (
     <ImageBackground source={selectedImage} style={styles.background}>
-      {/* Ajout du flou */}
+
       <BlurView intensity={9} style={styles.blurContainer}>
         <Text style={styles.title}>Mario Partie</Text>
 
-        {/* Affichage de l'icône */}
+   
         <Image source={selectedIcon} style={styles.icon} />
 
         <TouchableOpacity onPress={getRandomBoard} style={styles.button}>
