@@ -4,14 +4,46 @@ import { BlurView } from "expo-blur";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "./store/useStore";
 import { useFonts } from "expo-font";
+import { Audio } from "expo-av";
+import * as Haptics from "expo-haptics";
 
 export default function App() {
   const { selectedImage, selectedIcon, getRandomBoard, logo } = useStore();
-  
+  const [sound, setSound] = useState();
 
+  const triggerHapticsMedium = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  };
+
+  const triggerHapticsHeavy = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
+  }
+
+  useEffect(() => {
+    async function playMusic() {
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require("./assets/sounds/Mario-Kart-Stadium-Mario-Kart 8-OST.mp3"),
+          { shouldPlay: true, isLooping: true }
+        );
+        setSound(sound);
+        await sound.playAsync();
+      } catch (error) {
+        console.error("Erreur lors du chargement du son :", error);
+      }
+    }
+
+    playMusic();
+
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, []);
 
   const [isFontLoaded] = useFonts({
-    "maPolice": require("./assets/fonts/AOTFShinGoProDeBold.otf"), 
+    maPolice: require("./assets/fonts/AOTFShinGoProDeBold.otf"),
   });
 
   const [isReady, setIsReady] = useState(false);
@@ -23,6 +55,7 @@ export default function App() {
   }, [isFontLoaded]);
 
   const animatedValue = useRef(new Animated.Value(0)).current;
+  const rotationValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.loop(
@@ -43,6 +76,27 @@ export default function App() {
     ).start();
   }, []);
 
+  // Animation de rotation
+  const spinAnimation = () => {
+    return new Promise((resolve) => {
+      Animated.timing(rotationValue, {
+        toValue: 1, 
+        duration: 1000, 
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start(() => {
+        rotationValue.setValue(0); 
+        resolve(); 
+      });
+    });
+  };
+
+  const handleGenerateMap = async () => {
+    triggerHapticsMedium(); 
+    await spinAnimation(); 
+    getRandomBoard(); 
+  };
+
   return (
     <View style={styles.container}>
       {!isReady ? (
@@ -51,15 +105,29 @@ export default function App() {
         </View>
       ) : (
         <ImageBackground source={selectedImage} style={styles.background}>
-          <BlurView intensity={9} style={styles.blurContainer}>
-           
-            <Image source={logo} style={styles.logo} />
-            
+          <BlurView intensity={4} style={styles.blurContainer}>
+            {logo && <Image source={logo} style={styles.logo} />}
+
             <Animated.Image
               source={selectedIcon}
-              style={[styles.icon, { transform: [{ translateY: animatedValue }] }]}
+              style={[
+                styles.icon,
+                {
+                  transform: [
+                    { translateY: animatedValue }, 
+                    {
+                      rotate: rotationValue.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["0deg", "360deg"], 
+
+                      }),
+                    },
+                  ],
+                },
+              ]}
             />
-            <TouchableOpacity onPress={getRandomBoard} style={styles.button}>
+
+            <TouchableOpacity onPress={handleGenerateMap} style={styles.button}>
               <Text style={styles.buttonText}>Générer une map</Text>
             </TouchableOpacity>
           </BlurView>
