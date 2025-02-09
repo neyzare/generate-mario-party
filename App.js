@@ -1,5 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import { ImageBackground, StyleSheet, Text, TouchableOpacity, View, Animated, Easing, ActivityIndicator, Image } from "react-native";
+import { 
+  ImageBackground, StyleSheet, Text, TouchableOpacity, View, 
+  Animated, Easing, ActivityIndicator, Image 
+} from "react-native";
 import { BlurView } from "expo-blur";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "./store/useStore";
@@ -16,8 +19,8 @@ export default function App() {
   };
 
   const triggerHapticsHeavy = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
-  }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+  };
 
   useEffect(() => {
     async function playMusic() {
@@ -76,7 +79,6 @@ export default function App() {
     ).start();
   }, []);
 
-  // Animation de rotation
   const spinAnimation = () => {
     return new Promise((resolve) => {
       Animated.timing(rotationValue, {
@@ -85,16 +87,17 @@ export default function App() {
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }).start(() => {
-        rotationValue.setValue(0); 
-        resolve(); 
+        rotationValue.setValue(0);
+        resolve();
+        triggerHapticsHeavy(); 
       });
     });
   };
 
   const handleGenerateMap = async () => {
-    triggerHapticsMedium(); 
-    await spinAnimation(); 
-    getRandomBoard(); 
+    triggerHapticsMedium();
+    await spinAnimation();
+    getRandomBoard();
   };
 
   return (
@@ -114,12 +117,11 @@ export default function App() {
                 styles.icon,
                 {
                   transform: [
-                    { translateY: animatedValue }, 
+                    { translateY: animatedValue },
                     {
                       rotate: rotationValue.interpolate({
                         inputRange: [0, 1],
-                        outputRange: ["0deg", "360deg"], 
-
+                        outputRange: ["0deg", "360deg"],
                       }),
                     },
                   ],
@@ -127,8 +129,8 @@ export default function App() {
               ]}
             />
 
-            <TouchableOpacity onPress={handleGenerateMap} style={styles.button}>
-              <Text style={styles.buttonText}>Générer une map</Text>
+            <TouchableOpacity onPress={handleGenerateMap} style={styles.marioButton}>
+              <Text style={styles.marioButtonText}>🎲 Générer une map 🎲</Text>
             </TouchableOpacity>
           </BlurView>
           <StatusBar style="auto" />
@@ -168,16 +170,28 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     resizeMode: "contain",
   },
-  button: {
+  marioButton: {
     marginTop: 20,
-    padding: 10,
-    backgroundColor: "blue",
-    borderRadius: 5,
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    backgroundColor: "#FFD700",
+    borderRadius: 15,
+    borderWidth: 4,
+    borderColor: "#FF4500",
+    shadowColor: "#000",
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 5,
+    elevation: 10,
   },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
+  marioButtonText: {
+    color: "#D70000",
+    fontSize: 22,
     fontFamily: "maPolice",
+    fontWeight: "bold",
+    textShadowColor: "#fff",
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
   },
   loadingContainer: {
     flex: 1,
